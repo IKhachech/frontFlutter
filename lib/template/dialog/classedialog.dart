@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:tp70/entities/classe.dart';
-import 'package:tp70/entities/student.dart';
 import 'package:tp70/services/classeservice.dart';
-import 'package:tp70/services/studentservice.dart';
 
+// ignore: must_be_immutable
 class ClassDialog extends StatefulWidget {
   final Function()? notifyParent;
   Classe? classe;

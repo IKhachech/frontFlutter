@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:http/http.dart';
+import 'package:intl/intl.dart';
 import 'package:tp70/entities/absence.dart';
 import 'package:tp70/entities/student.dart';
 import 'package:tp70/services/classeservice.dart';
+import 'package:tp70/entities/matier.dart';
 import 'package:tp70/template/dialog/absencedialog.dart';
 import 'package:tp70/template/navbar.dart';
 import 'package:http/http.dart' as http;
@@ -11,30 +14,56 @@ import 'package:http/http.dart';
 import 'dart:convert';
 import '../entities/classe.dart';
 
-class AbsenceScreen extends StatefulWidget {
+class AbsenceMatScrenn extends StatefulWidget {
+  const AbsenceMatScrenn({super.key});
+
   @override
-  AbsenceScreenState createState() => AbsenceScreenState();
+  AbsenceMatScrennState createState() => AbsenceMatScrennState();
 }
 
-class AbsenceScreenState extends State<AbsenceScreen> {
+class AbsenceMatScrennState extends State<AbsenceMatScrenn> {
   List<Classe> classes = [];
   List<Student> students = [];
   Classe? selectedClass;
   Student? selectedStudent;
   List<Absence>? absences;
 
+  List<Matier>? matiers;
+  Matier? selectedMatiere;
+  TextEditingController dateCtrl = TextEditingController();
+  DateTime selectedDate = DateTime.now();
+
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        dateCtrl.text =
+            DateFormat("yyyy-MM-dd").format(DateTime.parse(picked.toString()));
+        selectedDate = picked;
+        getAbsenceByMatiereAndDate();
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    // Fetch classes when the screen loads
     getAllClasses().then((result) {
-      print("success getting all classes from absence screen");
+      if (kDebugMode) {
+        print("success ");
+      }
       setState(() {
         classes = result;
       });
 
-      print("class from absencescreen: " +
+      if (kDebugMode) {
+        print(
           classes.elementAt(0).matieres.toString());
+      }
     });
   }
 
@@ -42,30 +71,37 @@ class AbsenceScreenState extends State<AbsenceScreen> {
     setState(() {});
   }
 
-  Future<void> getStudentsByClass(Classe selectedClass) async {
-    Response response = await http.get(Uri.parse(
-        "http://localhost:8089/etudiant/getByClasseId/${selectedClass.codClass}"));
-    if (response.statusCode == 200) {
-      List<dynamic> data = jsonDecode(response.body);
-      List<Student> studentsInClass =
-          data.map((json) => Student.fromJson(json)).toList();
-      setState(() {
-        students = studentsInClass;
-      });
-    } else {
-      throw Exception("Failed to load students");
-    }
-  }
+
 
   Future<void> getAbsenceByStudentId() async {
     Response response = await http.get(Uri.parse(
-        "http://localhost:8089/absence/getByEtudiantId/${this.selectedStudent?.id}"));
+        "http://localhost:8089/absence/getByEtudiantId/${selectedStudent?.id}"));
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
       List<Absence> studentAbcenses =
           data.map((json) => Absence.fromJson(json)).toList();
       setState(() {
         absences = studentAbcenses;
+      });
+    } else {
+      throw Exception("Failed to load absences");
+    }
+  }
+
+  Future<void> getAbsenceByMatiereAndDate() async {
+    String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+    String url =
+        "http://localhost:8089/absence/getByMatiereIdAndDate/?matiereId=${selectedMatiere?.matiereId.toString()}&date=$formattedDate";
+    print(url);
+    Response response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      List<Absence> matiereDateAbsences =
+          data.map((json) => Absence.fromJson(json)).toList();
+
+      setState(() {
+        absences = matiereDateAbsences;
       });
     } else {
       throw Exception("Failed to load absences");
@@ -86,7 +122,6 @@ class AbsenceScreenState extends State<AbsenceScreen> {
                 absences = null;
                 selectedClass = value;
                 if (selectedClass != null) {
-                  getStudentsByClass(selectedClass!);
                 }
               });
             },
@@ -96,25 +131,30 @@ class AbsenceScreenState extends State<AbsenceScreen> {
                 child: Text(classe.nomClass),
               );
             }).toList(),
-            decoration: const InputDecoration(labelText: "Select a Class"),
+            decoration: const InputDecoration(labelText: "Class"),
           ),
-          DropdownButtonFormField<Student>(
-            value: selectedStudent,
-            onChanged: (Student? value) {
+          DropdownButtonFormField<Matier>(
+            value: selectedMatiere,
+            onChanged: (Matier? value) {
               setState(() {
-                selectedStudent = value;
+                selectedMatiere = value;
               });
-
-              // Fetch students absence
-              getAbsenceByStudentId();
             },
-            items: students.map((Student student) {
-              return DropdownMenuItem<Student>(
-                value: student,
-                child: Text(student.nom),
+            items: selectedClass?.matieres?.map((Matier matiere) {
+              return DropdownMenuItem<Matier>(
+                value: matiere,
+                child: Text(matiere.matiereName),
               );
             }).toList(),
-            decoration: const InputDecoration(labelText: "Select a Student"),
+            decoration: const InputDecoration(labelText: "Matier"),
+          ),
+          TextFormField(
+            controller: dateCtrl,
+            readOnly: true,
+            decoration: const InputDecoration(labelText: "Date"),
+            onTap: () {
+              _selectDate(context);
+            },
           ),
           Expanded(
               child: ListView.builder(
@@ -154,7 +194,7 @@ class AbsenceScreenState extends State<AbsenceScreen> {
                     ],
                   ),
                   endActionPane: ActionPane(
-                    motion: ScrollMotion(),
+                    motion: const ScrollMotion(),
                     dismissible: DismissiblePane(onDismissed: () async {
                       deleteAbsence(absences?.elementAt(index).absenceId);
                       getAbsenceByStudentId();
@@ -172,10 +212,10 @@ class AbsenceScreenState extends State<AbsenceScreen> {
                             Row(
                               children: [
                                 const Text(
-                                  "Student name: ",
+                                  "Student: ",
                                 ),
                                 Text(
-                                  "${absences!.elementAt(index).etudiant?.nom} ${absences!.elementAt(index).etudiant?.prenom}",
+                                  "${absences!.elementAt(index).etudiant?.nom ?? 'N/A'} ${absences!.elementAt(index).etudiant?.prenom ?? 'N/A'}",
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -184,7 +224,7 @@ class AbsenceScreenState extends State<AbsenceScreen> {
                             ),
                             Row(
                               children: [
-                                const Text("Hours number: "),
+                                const Text("Hour: "),
                                 Text(
                                   absences!
                                       .elementAt(index)
@@ -201,7 +241,7 @@ class AbsenceScreenState extends State<AbsenceScreen> {
                             ),
                             Row(
                               children: [
-                                const Text("Matiere name: "),
+                                const Text("Matier: "),
                                 Text(
                                     absences
                                             ?.elementAt(index)
@@ -211,7 +251,7 @@ class AbsenceScreenState extends State<AbsenceScreen> {
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         backgroundColor:
-                                            const Color.fromARGB(255, 68, 255, 224)))
+                                            Color.fromARGB(255, 68, 255, 224)))
                               ],
                             ),
                           ],
@@ -221,15 +261,11 @@ class AbsenceScreenState extends State<AbsenceScreen> {
                   ),
                 );
               }
-              // show whene selected student is null
               return Container(
                 margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-                child: const Text("Select a student!",
+                child: const Text("test avec DSI31/FLUTTER le 11/12 ou 3/12 exist deja dans la base",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w900,
-                        backgroundColor: const Color.fromARGB(255, 68, 255, 224))),
+                ),
               );
             },
           )),
@@ -238,22 +274,19 @@ class AbsenceScreenState extends State<AbsenceScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color.fromARGB(255, 68, 255, 224),
         onPressed: () async {
-  print("FloatingActionButton clicked");
-  print("Selected Class: $selectedClass");
-  // Add other necessary checks
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AbsenceDialog(
-        notifyParent: refresh,
-        getAllAbsence: getAbsenceByStudentId,
-        matieres: selectedClass?.matieres,
-        absence: Absence(0, "", selectedStudent, null, null),
-        modif: false,
-      );
-    });
-},
-
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AbsenceDialog(
+                  notifyParent: refresh,
+                  getAllAbsence: getAbsenceByStudentId,
+                  matieres: selectedClass?.matieres,
+                  absence: Absence(0, "", selectedStudent, null, null),
+                  modif: false,
+                );
+              });
+          //print("test");
+        },
         child: const Icon(Icons.add),
       ),
     );

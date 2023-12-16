@@ -1,14 +1,11 @@
-import 'dart:ffi';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tp70/entities/absence.dart';
-import 'package:tp70/entities/classe.dart';
 import 'package:tp70/entities/matier.dart';
-import 'package:tp70/entities/student.dart';
 import 'package:tp70/services/classeservice.dart';
-import 'package:tp70/services/studentservice.dart';
 
+// ignore: must_be_immutable
 class AbsenceDialog extends StatefulWidget {
   final Function()? notifyParent;
   final Function()? getAllAbsence;
@@ -36,10 +33,8 @@ class AbsenceDialogState extends State<AbsenceDialog> {
 
   Absence? absence;
 
-  String title = "Ajouter Absence";
+  String title = "Add Absence";
   DateTime selectedDate = DateTime.now();
-
-// ...
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
@@ -50,11 +45,9 @@ class AbsenceDialogState extends State<AbsenceDialog> {
     );
 
     if (pickedDate != null) {
-      // ignore: use_build_context_synchronously
-      TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.now(),
-      );
+      TimeOfDay? pickedTime =
+          // ignore: use_build_context_synchronously
+          await showTimePicker(context: context, initialTime: TimeOfDay.now());
 
       if (pickedTime != null) {
         DateTime pickedDateTime = DateTime(
@@ -65,7 +58,6 @@ class AbsenceDialogState extends State<AbsenceDialog> {
           pickedTime.minute,
         );
 
-        // Format the DateTime as a string in the desired format
         String formattedDateTime =
             DateFormat("yyyy-MM-ddTHH:mm:ss").format(pickedDateTime);
 
@@ -83,12 +75,13 @@ class AbsenceDialogState extends State<AbsenceDialog> {
   void initState() {
     matiers = widget.matieres;
     absence = widget.absence;
-    print("matiere from dialogabsent: ${matiers.toString()}");
-    // TODO: implement initState
+    if (kDebugMode) {
+      print("${matiers.toString()}");
+    }
     super.initState();
 
     if (widget.absence != null) {
-      title = "Modifier Absence";
+      title = "Update Absence";
       nbhAbsence.text = (widget.absence?.absenceNb).toString();
       dateAbsence.text = (widget.absence?.date).toString();
       idAbsence = widget.absence?.absenceId;
@@ -106,16 +99,19 @@ class AbsenceDialogState extends State<AbsenceDialog> {
               controller: nbhAbsence,
               validator: (String? value) {
                 if (value!.isEmpty) {
-                  return "Champs est obligatoire";
+                  return "....";
+                }
+                if (double.tryParse(value) == null) {
+                  return "Enter a valid number";
                 }
                 return null;
               },
-              decoration: const InputDecoration(labelText: "nombre heure"),
+              decoration: const InputDecoration(labelText: ""),
             ),
             TextFormField(
               controller: dateAbsence,
               readOnly: true,
-              decoration: const InputDecoration(labelText: "Date de naissance"),
+              decoration: const InputDecoration(labelText: ""),
               onTap: () {
                 _selectDate(context);
               },
@@ -128,42 +124,39 @@ class AbsenceDialogState extends State<AbsenceDialog> {
                 });
               },
               items: matiers?.map((Matier matiere) {
-                return DropdownMenuItem<Matier>(
-                  value: matiere,
-                  child: Text(matiere.matiereName),
-                );
-              }).toList(),
-              decoration: const InputDecoration(labelText: "Matiere"),
+                    return DropdownMenuItem<Matier>(
+                      value: matiere,
+                      child: Text(matiere.matiereName),
+                    );
+                  }).toList() ??
+                  [],
+              decoration: const InputDecoration(labelText: "Matier"),
             ),
             ElevatedButton(
                 onPressed: () async {
                   if (widget.modif == false) {
-                    print("inserting");
-
-                    await addAbsence(Absence(double.parse(nbhAbsence.text),
-                            dateAbsence.text, null, null))
-                        .then((value) => {
-                              // get new added absence
-                              widget.getAllAbsence!(),
-                              widget.notifyParent!()
-                            });
+                    await addAbsence(Absence(
+                            double.parse(nbhAbsence.text),
+                            dateAbsence.text,
+                            absence?.etudiant,
+                            selectedMatiere,
+                            absence?.absenceId))
+                        .then((value) =>
+                            {widget.getAllAbsence!(), widget.notifyParent!()});
                   } else {
-                    print("updating");
                     await updateAbsence(Absence(
                             double.parse(nbhAbsence.text),
                             dateAbsence.text,
                             absence?.etudiant,
                             selectedMatiere,
                             absence?.absenceId))
-                        .then((value) => {
-                              // get new added absence
-                              widget.getAllAbsence!(),
-                              widget.notifyParent!()
-                            });
+                        .then((value) =>
+                            {widget.getAllAbsence!(), widget.notifyParent!()});
                   }
+                  // ignore: use_build_context_synchronously
                   Navigator.pop(context);
                 },
-                child: const Text("Ajouter"))
+                child: const Text("Add"))
           ],
         ),
       ),

@@ -1,11 +1,8 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:tp70/entities/student.dart';
-
-import '../entities/classe.dart';
 
 Future getAllStudent() async {
   Response response =
@@ -70,6 +67,6 @@ Future<List<Student>> getStudentsByClassQuery(int id) async {
 
     return students;
   } else {
-    throw Exception("Failed to load students by class using query");
+    throw Exception("Failed");
   }
 }

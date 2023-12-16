@@ -1,13 +1,9 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:tp70/entities/classe.dart';
 import 'package:tp70/entities/matier.dart';
-import 'package:tp70/entities/student.dart';
 import 'package:tp70/services/classeservice.dart';
-import 'package:tp70/services/studentservice.dart';
 
+// ignore: must_be_immutable
 class MatierDialog extends StatefulWidget {
   final Function()? notifyParent;
   Matier? matier;
@@ -23,7 +19,7 @@ class _MatierDialogState extends State<MatierDialog> {
   Classe? selectedClass;
   List<Classe> classes = [];
 
-  String title = "Ajouter Matier";
+  String title = "Add Matier";
   bool modif = false;
 
   late int idMatier;
@@ -39,10 +35,9 @@ class _MatierDialogState extends State<MatierDialog> {
       });
     });
 
-    print("hi");
     if (widget.matier != null) {
       modif = true;
-      title = "Modifier matier";
+      title = "Update matier";
       nameMat.text = (widget.matier!.matiereName).toString();
       coefMat.text = (widget.matier!.matiereCoef).toString();
       idMatier = widget.matier!.matiereId!;
@@ -60,11 +55,11 @@ class _MatierDialogState extends State<MatierDialog> {
               controller: nameMat,
               validator: (String? value) {
                 if (value!.isEmpty) {
-                  return "Champs est obligatoire";
+                  return "....";
                 }
                 return null;
               },
-              decoration: const InputDecoration(labelText: "nom"),
+              decoration: const InputDecoration(labelText: "name"),
             ),
             TextFormField(
               controller: coefMat,
@@ -83,7 +78,7 @@ class _MatierDialogState extends State<MatierDialog> {
                   child: Text(classe.nomClass),
                 );
               }).toList(),
-              decoration: const InputDecoration(labelText: "Classe"),
+              decoration: const InputDecoration(labelText: "Class"),
             ),
             ElevatedButton(
                 onPressed: () async {
@@ -99,7 +94,7 @@ class _MatierDialogState extends State<MatierDialog> {
                   }
                   Navigator.pop(context);
                 },
-                child: const Text("Ajouter"))
+                child: const Text("Add"))
           ],
         ),
       ),

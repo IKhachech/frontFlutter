@@ -6,14 +6,12 @@ import 'package:tp70/entities/absence.dart';
 
 import 'package:tp70/entities/classe.dart';
 import 'package:tp70/entities/matier.dart';
-import 'package:tp70/entities/student.dart';
 
 Future<List<Classe>> getAllClasses() async {
   Response response =
       await http.get(Uri.parse("http://localhost:8089/class/all"));
   List<dynamic> jsonResponse = jsonDecode(response.body);
 
-  // Assuming each item in the jsonResponse can be converted to a Classe
   List<Classe> classes =
       jsonResponse.map((json) => Classe.fromJson(json)).toList();
 
@@ -24,15 +22,11 @@ Future<List<Matier>> getAllMatiers() async {
   Response response =
       await http.get(Uri.parse("http://localhost:8089/matier/all"));
   List<dynamic> jsonResponse = jsonDecode(response.body);
-
-  // Assuming each item in the jsonResponse can be converted to a Classe
   List<Matier> matieres =
       jsonResponse.map((json) => Matier.fromJson(json)).toList();
 
   return matieres;
 }
-
-// absence
 
 Future addAbsence(Absence absence) async {
   Response response =

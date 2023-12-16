@@ -7,9 +7,9 @@ import 'package:tp70/entities/student.dart';
 import 'package:tp70/services/studentservice.dart';
 
 import '../../entities/classe.dart';
-import '../../services/classeservice.dart';
 import 'package:http/http.dart' as http;
 
+// ignore: must_be_immutable
 class AddStudentDialog extends StatefulWidget {
   final Function()? notifyParent;
   Student? student;
@@ -33,7 +33,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   TextEditingController dateNaisCtrl = TextEditingController();
 
   DateTime selectedDate = DateTime.now();
-  String title = "Ajouter Etudiant";
+  String title = "Add Etudiant";
   bool modif = false;
   late int idStudent;
   Classe? selectedClass;
@@ -57,12 +57,9 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
   @override
   void initState() {
     super.initState();
-    selectedClass = widget
-        .selectedClasse; // Set selectedClass to the value from the constructor
+    selectedClass = widget.selectedClasse;
     print("selected class: ${selectedClass}");
-    // Use await to wait for the completion of the Future
     getAllClasses().then((result) {
-      // Check if the result is a List<Classe> before assigning
       setState(() {
         classes = result;
       });
@@ -70,7 +67,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
 
     if (widget.student != null) {
       modif = true;
-      title = "Modifier Etudiant";
+      title = "Update Etudiant";
       nomCtrl.text = widget.student!.nom;
       prenomCtrl.text = widget.student!.prenom;
       dateCtrl.text = DateFormat("yyyy-MM-dd")
@@ -91,26 +88,26 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
               controller: nomCtrl,
               validator: (String? value) {
                 if (value!.isEmpty) {
-                  return "Champs est obligatoire";
+                  return "...";
                 }
                 return null;
               },
-              decoration: const InputDecoration(labelText: "Nom"),
+              decoration: const InputDecoration(labelText: "Name"),
             ),
             TextFormField(
               controller: prenomCtrl,
               validator: (String? value) {
                 if (value!.isEmpty) {
-                  return "Champs est obligatoire";
+                  return "....";
                 }
                 return null;
               },
-              decoration: const InputDecoration(labelText: "Prénom"),
+              decoration: const InputDecoration(labelText: "FirstName"),
             ),
             TextFormField(
               controller: dateCtrl,
               readOnly: true,
-              decoration: const InputDecoration(labelText: "Date de naissance"),
+              decoration: const InputDecoration(labelText: "Date"),
               onTap: () {
                 _selectDate(context);
               },
@@ -128,7 +125,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
                   child: Text(classe.nomClass),
                 );
               }).toList(),
-              decoration: const InputDecoration(labelText: "Classe"),
+              decoration: const InputDecoration(labelText: "Class"),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -152,7 +149,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
                 }
                 Navigator.pop(context);
               },
-              child: const Text("Ajouter"),
+              child: const Text("Add"),
             ),
           ],
         ),

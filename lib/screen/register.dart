@@ -1,12 +1,15 @@
 import 'dart:convert';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import '../entities/user.dart';
 
 class Register extends StatefulWidget {
+  const Register({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _RegisterState createState() => _RegisterState();
 }
 
@@ -22,16 +25,17 @@ class _RegisterState extends State<Register> {
     var res = await http.post(Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'email': user.email, 'password': user.password}));
-    print(res.body);
-    if (res.body != null) {
-      Navigator.pop(context);
+    if (kDebugMode) {
+      print(res.body);
     }
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueGrey[900], // Change the background color
+      backgroundColor: Colors.blueGrey[900],
       body: Center(
         child: SingleChildScrollView(
           child: Form(
@@ -70,7 +74,7 @@ class _RegisterState extends State<Register> {
                             filled: true,
                           ),
                           validator: (value) {
-                            // Your validation logic
+                            return null;
                           },
                         ),
                         const SizedBox(
@@ -85,7 +89,7 @@ class _RegisterState extends State<Register> {
                           ),
                           obscureText: true,
                           validator: (value) {
-                            // Your validation logic
+                            return null;
                           },
                         ),
                         const SizedBox(
@@ -93,7 +97,7 @@ class _RegisterState extends State<Register> {
                         ),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            primary: const Color.fromARGB(255, 68, 255, 224), // Change the button color
+                            primary: const Color.fromARGB(255, 68, 255, 224),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:tp70/services/classeservice.dart';
 import 'package:tp70/entities/matier.dart';
-import 'package:tp70/template/dialog/classedialog.dart';
 import 'package:tp70/template/dialog/matierdialog.dart';
 import 'package:tp70/template/navbar.dart';
 
-import '../entities/classe.dart';
-
 class MatiereScreen extends StatefulWidget {
+  const MatiereScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _MatiereScreenState createState() => _MatiereScreenState();
 }
 
@@ -57,7 +57,8 @@ class _MatiereScreenState extends State<MatiereScreen> {
                               });
                           //print("test");
                         },
-                        backgroundColor: const Color.fromARGB(255, 68, 255, 224),
+                        backgroundColor:
+                            const Color.fromARGB(255, 68, 255, 224),
                         foregroundColor: Colors.white,
                         icon: Icons.edit,
                         label: 'Edit',
@@ -133,7 +134,6 @@ class _MatiereScreenState extends State<MatiereScreen> {
                   notifyParent: refresh,
                 );
               });
-          //print("test");
         },
         child: const Icon(Icons.add),
       ),

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:tp70/entities/formation.dart';
-import 'package:tp70/entities/student.dart';
 import 'package:tp70/services/formationservice.dart';
-import 'package:tp70/services/studentservice.dart';
 
+// ignore: must_be_immutable
 class FormationDialog extends StatefulWidget {
   final Function()? notifyParent;
   Formation? formation;
@@ -19,18 +17,17 @@ class _FormationDialogState extends State<FormationDialog> {
 
   TextEditingController dureeCtrl = TextEditingController();
 
-  String title = "Ajouter Formation";
+  String title = "Add Formation";
   bool modif = false;
 
   late int idFormation;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     if (widget.formation != null) {
       modif = true;
-      title = "Modifier Formation";
+      title = "update Formation";
       nomCtrl.text = widget.formation!.nom;
       dureeCtrl.text = widget.formation!.duree.toString();
       idFormation = widget.formation!.id!;
@@ -48,21 +45,21 @@ class _FormationDialogState extends State<FormationDialog> {
               controller: nomCtrl,
               validator: (String? value) {
                 if (value!.isEmpty) {
-                  return "Champs est obligatoire";
+                  return ".....";
                 }
                 return null;
               },
-              decoration: const InputDecoration(labelText: "nom"),
+              decoration: const InputDecoration(labelText: "name"),
             ),
             TextFormField(
               controller: dureeCtrl,
               validator: (String? value) {
                 if (value!.isEmpty) {
-                  return "Champs est obligatoire";
+                  return ".....";
                 }
                 return null;
               },
-              decoration: const InputDecoration(labelText: "Durée"),
+              decoration: const InputDecoration(labelText: "Period"),
             ),
             ElevatedButton(
                 onPressed: () async {
@@ -76,7 +73,7 @@ class _FormationDialogState extends State<FormationDialog> {
                   widget.notifyParent!();
                   Navigator.pop(context);
                 },
-                child: const Text("Ajouter"))
+                child: const Text("Add"))
           ],
         ),
       ),

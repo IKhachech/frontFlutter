@@ -11,7 +11,7 @@ class NavBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(
         navTitle,
         style: const TextStyle(
-          color: Colors.white, // Change the text color
+          color: Color.fromARGB(255, 189, 63, 10), // Change the text color
           fontWeight: FontWeight.bold,
         ),
       ),

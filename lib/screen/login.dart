@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -9,7 +10,10 @@ import 'dashboard.dart';
 import 'register.dart';
 
 class Login extends StatefulWidget {
+  const Login({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _LoginState createState() => _LoginState();
 }
 
@@ -24,15 +28,15 @@ class _LoginState extends State<Login> {
     var res = await http.post(Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'email': user.email, 'password': user.password}));
-    print(res.body);
-    if (res.body != null) {
-      // ignore: use_build_context_synchronously
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Dashboard(),
-          ));
+    if (kDebugMode) {
+      print(res.body);
     }
+    // ignore: use_build_context_synchronously
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Dashboard(),
+        ));
   }
 
   @override
@@ -53,7 +57,7 @@ class _LoginState extends State<Login> {
                     borderRadius: BorderRadius.circular(20.0),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(20.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -77,7 +81,7 @@ class _LoginState extends State<Login> {
                             filled: true,
                           ),
                           validator: (value) {
-                            // Your validation logic
+                            return null;
                           },
                         ),
                         const SizedBox(
@@ -92,7 +96,7 @@ class _LoginState extends State<Login> {
                           ),
                           obscureText: true,
                           validator: (value) {
-                            // Your validation logic
+                            return null;
                           },
                         ),
                         const SizedBox(
@@ -110,7 +114,7 @@ class _LoginState extends State<Login> {
                           child: const Text(
                             "Don't have an account?",
                             style: TextStyle(
-                              color: const Color.fromARGB(255, 68, 255, 224),
+                              color: Color.fromARGB(255, 68, 255, 224),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -120,7 +124,8 @@ class _LoginState extends State<Login> {
                         ),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 68, 255, 224),
+                            backgroundColor:
+                                const Color.fromARGB(255, 68, 255, 224),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),

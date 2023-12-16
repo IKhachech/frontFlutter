@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:tp70/template/navbar.dart';
 
 class Dashboard extends StatelessWidget {
@@ -53,6 +52,14 @@ class Dashboard extends StatelessWidget {
               title: const Text('Formations'),
               onTap: () {
                 Navigator.pushNamed(context, '/formation');
+              },
+            ),
+
+            ////////up
+             ListTile(
+              title: const Text('AbscenceMat'),
+              onTap: () {
+                Navigator.pushNamed(context, '/abscencesMat');
               },
             ),
           ],
